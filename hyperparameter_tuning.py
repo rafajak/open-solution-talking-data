@@ -1,3 +1,5 @@
+import gc
+
 import numpy as np
 from deepsense import neptune
 from sklearn.externals import joblib
@@ -40,6 +42,9 @@ class RandomSearchOptimizer(BaseTransformer):
             run_score = self.score_func(y_valid, y_pred_valid_value)
             results.append((run_score, param_set))
 
+            del y_pred_valid, transformer
+            gc.collect()
+
             for callback in self.callbacks:
                 callback.on_run_end(score=run_score, params=param_set)
 
@@ -79,9 +84,10 @@ def create_param_space(params, n_runs):
             if isinstance(value, list):
                 if len(value) == 2:
                     mode = 'choice'
+                    param_choice[param] = sample_param_space(value, mode)
                 else:
-                    mode = value[2]
-                param_choice[param] = sample_param_space(value[:2], mode)
+                    mode = value[-1]
+                    param_choice[param] = sample_param_space(value[:-1], mode)
             else:
                 param_choice[param] = value
         param_space.append(param_choice)
@@ -89,15 +95,18 @@ def create_param_space(params, n_runs):
 
 
 def sample_param_space(value_range, mode):
-    range_min, range_max = value_range
-    if mode == 'choice':
-        value = np.random.choice(range(range_min, range_max, 1))
-    elif mode == 'uniform':
-        value = np.random.uniform(low=range_min, high=range_max)
-    elif mode == 'log-uniform':
-        value = np.exp(np.random.uniform(low=np.log(range_min), high=np.log(range_max)))
+    if mode == 'list':
+        value = np.random.choice(value_range)
     else:
-        raise NotImplementedError
+        range_min, range_max = value_range
+        if mode == 'choice':
+            value = np.random.choice(range(range_min, range_max, 1))
+        elif mode == 'uniform':
+            value = np.random.uniform(low=range_min, high=range_max)
+        elif mode == 'log-uniform':
+            value = np.exp(np.random.uniform(low=np.log(range_min), high=np.log(range_max)))
+        else:
+            raise NotImplementedError
     return value
 
 

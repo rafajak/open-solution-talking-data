@@ -22,6 +22,7 @@ exclude:
 
 parameters:
 # Data
+<<<<<<< HEAD
   raw_train_filepath: /public/talking_data/train.csv
   train_chunks_dir:   /public/talking_data/files
   test_filepath:      /public/talking_data/test.csv
@@ -30,15 +31,26 @@ parameters:
   train_hours: '[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]'
   valid_days:  '[9]'
   valid_hours: '[4]'
+=======
+  raw_train_filepath: /public/talking_data/data/train.csv
+  train_chunks_dir: /public/talking_data/files/train_chunks
+  test_chunks_dir: /public/talking_data/files/test_chunks
+  test_filepath: /public/talking_data/data/test.csv
+  test_suplement_filepath: /public/talking_data/data/test_supplement.csv
+  experiment_dir: /ouptut/solution_week_2
+  train_days_hours: '{7: [17,18,19,20,21,22,23], 8: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}'
+  valid_days_hours: '{8: [17,18,19,20,21,22,23], 9: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}'
+  test_days_hours: '{9: [17,18,19,20,21,22,23], 10: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]}'
+  submission_hours: '[4,5,9,10,13,14]'
+>>>>>>> 1e9a06d665e3ed7040434bb9c5d93f00014dcea8
 
 # Execution
   overwrite: 1
   num_workers: 10
-  verbose: 1
+  verbose: 2
 
 # Preprocessing
-  target_encoder__min_samples_leaf: 5
-  target_encoder__smoothing: 1
+  target_encoder__n_splits: 10
 
 # Light GBM
   lgbm_random_search_runs: 0
@@ -59,3 +71,27 @@ parameters:
   lgbm__reg_lambda: 0.0
   lgbm__reg_alpha: 0.0
   lgbm__scale_pos_weight: 10
+
+# XGBoost
+  xgboost_random_search_runs: 0
+  xgboost__booster: gbtree
+  xgboost__objective: 'binary:logistic'
+  xgboost__eval_metric: 'auc'
+  xgboost__number_boosting_rounds: 100
+  xgboost__early_stopping_rounds: 10
+  xgboost__maximize: True
+  xgboost__learning_rate: 0.1
+  xgboost__max_depth: 3
+  xgboost__min_child_weight: 5
+  xgboost__gamma: 0.05
+  xgboost__subsample: 0.8
+  xgboost__colsample_bytree: 0.3
+  xgboost__reg_lambda:  0.01
+  xgboost__reg_alpha: 0.0
+  xgboost__scale_pos_weight: 200
+
+# Logistic Regression
+  log_reg_random_search_runs: 0
+  log_reg__penalty: "l2"
+  log_reg__C: 16
+  log_reg__class_weight: '{0:1, 1:150}'
